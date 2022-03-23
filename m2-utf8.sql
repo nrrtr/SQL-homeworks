@@ -49,7 +49,7 @@ SELECT concat (first_name,' ',last_name) AS "Фамилия и имя" , email A
 --Все буквы в фамилии и имени из верхнего регистра должны быть переведены в нижний регистр.
 
 SELECT LOWER(last_name) AS last_name, LOWER(first_name) AS first_name, active FROM customer c 
-WHERE first_name='WILLIE' OR first_name='KELLY' AND active>='1';
+WHERE (first_name='WILLIE' OR first_name='KELLY') AND active>='1';
 
 
 --======== ДОПОЛНИТЕЛЬНАЯ ЧАСТЬ ==============
