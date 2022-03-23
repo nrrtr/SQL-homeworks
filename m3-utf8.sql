@@ -87,14 +87,17 @@ having
 
 select 
 	concat (customer.last_name, ' ',customer.first_name) as "Фамилия и имя покупателя",
-	count(payment_id) as "Количество фильмов"
+	count(film_id) as "Количество фильмов"
 from
 	payment
 join customer using (customer_id)
+join rental using (rental_id)
+join inventory using (inventory_id)
 group by 1
-order by "Количество фильмов" 
+order by 2 
 desc limit 5
 ;
+
 
 --ЗАДАНИЕ №4
 --Посчитайте для каждого покупателя 4 аналитических показателя:
@@ -105,13 +108,15 @@ desc limit 5
 
 select 
 	concat(customer.last_name, ' ', customer.first_name) as "Фамилия и имя покупателя" ,
-	count (payment_id) as "Количество фильмов" ,
+	count (film_id) as "Количество фильмов" ,
 	round(sum(amount)) as "Общая стоимость платежей" ,
 	min(amount) as "Минимальная стоимость платежа" ,
 	max(amount) as "Максимальная стоимость платежа" 
 from 
 	customer
 join payment using (customer_id)
+join rental using (rental_id)
+join inventory using (inventory_id)
 group by 1
 order by 1
 ;
