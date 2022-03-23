@@ -9,9 +9,7 @@ SET search_path TO public;
 --город и страну проживания.
 
 select
-	customer_id ,
-	first_name ,
-	last_name ,
+	concat (last_name ,' ',first_name) AS "Customer name",
 	address ,
 	city ,
 	country 
@@ -34,34 +32,69 @@ inner join
 --ЗАДАНИЕ №2
 --С помощью SQL-запроса посчитайте для каждого магазина количество его покупателей.
 
-select store_id, count(*) 
-from customer
-group by store_id;  
+select 
+	store_id as "ID магазина", 
+	count(*) as "Количество покупателей" 
+from 
+	customer
+group by 
+	store_id
+	;  
 
 --Доработайте запрос и выведите только те магазины, 
 --у которых количество покупателей больше 300-от.
 --Для решения используйте фильтрацию по сгруппированным строкам 
 --с использованием функции агрегации.
 
-select store_id ,count(*)
-from customer
-group by store_id
-having count(*) > 300;
+select 
+	store_id as "ID магазина", 
+	count(*) as "Количество покупателей" 
+from 
+	customer
+group by 
+	store_id
+having 
+	count(*) > 300
+	;  
 
 -- Доработайте запрос, добавив в него информацию о городе магазина, 
 --а также фамилию и имя продавца, который работает в этом магазине.
 
-
-
-
+select 
+	store_id as "ID магазина", 
+	count(*) as "Количество покупателей" ,
+	city as "Город",
+	concat (staff.last_name ,' ',staff.first_name) as "Имя сотрудника"
+from 
+	customer
+join store using (store_id)
+inner join address on store.address_id = address.address_id 
+inner join city on address.city_id = city.city_id 
+join staff using (store_id)
+group by -- GROUP BY 1,3,4
+	store_id ,
+	address.address_id , 
+	city.city_id ,
+	staff.last_name ,
+	staff.first_name  
+having 
+	count(*) > 300
+	;  
 
 --ЗАДАНИЕ №3
 --Выведите ТОП-5 покупателей, 
 --которые взяли в аренду за всё время наибольшее количество фильмов
 
-
-
-
+select 
+	concat (customer.last_name, ' ',customer.first_name) as "Фамилия и имя покупателя",
+	count(payment_id) as "Количество фильмов"
+from
+	payment
+join customer using (customer_id)
+group by 1
+order by "Количество фильмов" 
+desc limit 5
+;
 
 --ЗАДАНИЕ №4
 --Посчитайте для каждого покупателя 4 аналитических показателя:
@@ -70,25 +103,44 @@ having count(*) > 300;
 --  3. минимальное значение платежа за аренду фильма
 --  4. максимальное значение платежа за аренду фильма
 
-
-
-
+select 
+	concat(customer.last_name, ' ', customer.first_name) as "Фамилия и имя покупателя" ,
+	count (payment_id) as "Количество фильмов" ,
+	round(sum(amount)) as "Общая стоимость платежей" ,
+	min(amount) as "Минимальная стоимость платежа" ,
+	max(amount) as "Максимальная стоимость платежа" 
+from 
+	customer
+join payment using (customer_id)
+group by 1
+;
 
 --ЗАДАНИЕ №5
 --Используя данные из таблицы городов составьте одним запросом всевозможные пары городов таким образом,
  --чтобы в результате не было пар с одинаковыми названиями городов. 
  --Для решения необходимо использовать декартово произведение.
  
-
-
-
+select distinct 
+	A.city as "Город 1",
+	B.city as "Город 2"
+from  -- from city A cross join city B 
+	city A , 
+	city B 
+where 
+	A.city != B.city
+;
 
 --ЗАДАНИЕ №6
 --Используя данные из таблицы rental о дате выдачи фильма в аренду (поле rental_date)
 --и дате возврата фильма (поле return_date), 
 --вычислите для каждого покупателя среднее количество дней, за которые покупатель возвращает фильмы.
  
-
+select customer_id ,
+	avg( date_part('day' , return_date- rental_date))  
+from
+	rental r 
+group by 1
+order by customer_id 
 
 
 
