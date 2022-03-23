@@ -9,7 +9,7 @@ SET search_path TO public;
 --город и страну проживания.
 
 select
-	concat (last_name ,' ',first_name) AS "Customer name",
+	concat (last_name ,' ',first_name) AS "Customer name" ,
 	address ,
 	city ,
 	country 
@@ -52,7 +52,7 @@ select
 from 
 	customer
 group by 
-	store_id
+	store_id 
 having 
 	count(*) > 300
 	;  
@@ -113,6 +113,7 @@ from
 	customer
 join payment using (customer_id)
 group by 1
+order by 1
 ;
 
 --ЗАДАНИЕ №5
@@ -135,36 +136,80 @@ where
 --и дате возврата фильма (поле return_date), 
 --вычислите для каждого покупателя среднее количество дней, за которые покупатель возвращает фильмы.
  
-select customer_id ,
-	avg( date_part('day' , return_date- rental_date))  
+select 
+	customer_id as "ID покупателя" ,
+	cast (avg(round(return_date::date - rental_date::date)) 
+	as dec(64,2)) as "Среднее кол-во дней на возврат" -- ROUND(AVG(return_date::date - rental.date::date),2) as "blabla" 
 from
-	rental r 
+	rental
 group by 1
-order by customer_id 
-
-
+order by 1 
+;
 
 --======== ДОПОЛНИТЕЛЬНАЯ ЧАСТЬ ==============
 
 --ЗАДАНИЕ №1
 --Посчитайте для каждого фильма сколько раз его брали в аренду и значение общей стоимости аренды фильма за всё время.
 
-
-
-
+select 
+	title as "Название фильма" ,
+	rating as "Рейтинг" ,
+	category.name as "Жанр" ,
+	release_year as "Год выпуска" ,
+	language.name as "Язык" ,
+	count(rental_id) as "Количество аренд" ,
+	sum(amount) as "Общая стоимость аренды"
+from film
+join film_category using (film_id)
+join category using (category_id)
+join "language" using (language_id)
+join inventory using (film_id)
+join rental using (inventory_id)
+join payment using (rental_id)
+group by 1,2,3,4,5
+order by 1
+;
 
 --ЗАДАНИЕ №2
 --Доработайте запрос из предыдущего задания и выведите с помощью запроса фильмы, которые ни разу не брали в аренду.
 
-
-
+select 
+	title as "Название фильма" ,
+	rating as "Рейтинг" ,
+	category.name as "Жанр" ,
+	release_year as "Год выпуска" ,
+	language.name as "Язык" ,
+	count(rental_id) as "Количество аренд" ,
+	sum(amount) as "Общая стоимость аренды"
+from film
+left join film_category using (film_id)
+join category using (category_id)
+join "language" using (language_id)
+left join inventory using (film_id)
+left join rental using (inventory_id)
+left join payment using (rental_id)
+group by 1,2,3,4,5
+having count(rental_id) = 0  
+order by 1
+;
 
 
 --ЗАДАНИЕ №3
 --Посчитайте количество продаж, выполненных каждым продавцом. Добавьте вычисляемую колонку "Премия".
 --Если количество продаж превышает 7300, то значение в колонке будет "Да", иначе должно быть значение "Нет".
 
-
+select 
+	staff_id ,
+	count(payment_id) as "Количество продаж" ,
+	case 
+		when count(payment_id)>=7300 then 'Да'
+		when count(payment_id)<=7300 then 'Нет'
+	end as "Премия"
+from
+	payment
+group by 1
+order by 1
+;
 
 
 
