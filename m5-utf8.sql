@@ -7,11 +7,31 @@ SET search_path TO public;
 --ЗАДАНИЕ №1
 --Сделайте запрос к таблице payment и с помощью оконных функций добавьте вычисляемые колонки согласно условиям:
 --Пронумеруйте все платежи от 1 до N по дате
+
+select *,
+	row_number () over (order by payment_date) as "ex 1-1"
+from payment p;
+
 --Пронумеруйте платежи для каждого покупателя, сортировка платежей должна быть по дате
+
+select *,
+	row_number () over (partition by customer_id order by payment_date) as "ex 1-2"
+from payment p;
+
 --Посчитайте нарастающим итогом сумму всех платежей для каждого покупателя, сортировка должна 
 --быть сперва по дате платежа, а затем по сумме платежа от наименьшей к большей
+
+select *,
+	sum(amount) over (partition by customer_id order by payment_date, amount rows between unbounded preceding and current row) as "ex 1-3"
+from payment p; 
+
 --Пронумеруйте платежи для каждого покупателя по стоимости платежа от наибольших к меньшим 
 --так, чтобы платежи с одинаковым значением имели одинаковое значение номера.
+
+select *,
+row_number ()
+from payment p;
+
 --Можно составить на каждый пункт отдельный SQL-запрос, а можно объединить все колонки в одном запросе.
 
 
